@@ -14,32 +14,54 @@ Os códigos-fonte dos pacotes ROS2 estão localizados no diretório `src/`.
 
 Os códigos-fonte dos pacotes ROS2 estão localizados no diretório `src/`.
 
-Já o Nó de exemplo está em: `src/my_robot_controller/my_robot_controller/my_first_node.py`
+Já o Nó de exemplo está em: `src/my_robot_controller/my_robot_controller/my_first_node.py`.
 
-Para usar, deve-se construir o workspace no diretório raiz `hera_ws`:
+> Observação: este fluxo foi pensado para Ubuntu 24.04 com ROS 2 Humble instalado. Ele não foi validado para outros sistemas operacionais ou distribuições.
 
+## Forma tradicional de rodar
+
+Entre no workspace:
+```bash
+cd hera_ws
+```
+Ative o ambiente Ros2:
 ```bash
 source /opt/ros/humble/setup.bash
 ```
-
-```
+Compile:
+```bash
 colcon build
 ```
-
-Depois deve-se carregar o ambiente de instalação e em seguida executar o nó:
-
+Ative o setup.bash:
 ```bash
 source install/setup.bash
-
 ```
+Rode o projeto de exemplo:
+```bash
 ros2 run my_robot_controller my_first_node
 ```
 
-Comandos principais usados:
+## Para rodar rapidamente
 
-- `source /opt/ros/humble/setup.bash`
-- `colcon build`
-- `source install/setup.bash`
-- `ros2 run my_robot_controller my_first_node`
+Na raiz do repositório, execute:
 
-O workspace está em `hera_ws`.
+```bash
+chmod +x run_hera.sh
+./run_hera.sh
+```
+
+Esse script faz automaticamente:
+
+- carrega o ambiente do ROS 2 com `source /opt/ros/humble/setup.bash`
+- compila o workspace com `colcon build --symlink-install`
+- carrega o ambiente de instalação com `source install/setup.bash`
+- executa o nó `my_first_node` do pacote `my_robot_controller`
+
+Você também pode passar o pacote e o nó desejados:
+
+```bash
+./run_hera.sh my_publisher
+./run_hera.sh my_robot_controller my_first_node
+./run_hera.sh hera_robot transcribe_service
+./run_hera.sh hera_robot transcribe_client
+```
