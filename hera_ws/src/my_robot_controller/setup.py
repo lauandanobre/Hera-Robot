@@ -14,7 +14,7 @@ setup(
     install_requires=['setuptools', 'vosk', 'pyaudio'],
     zip_safe=True,
     maintainer='lauanda nobre',
-    maintainer_email='hello-nobre@outlook.com',
+    maintainer_email='none',
     description='Esse é um repositório de estudos do ROS2 Humble',
     license='Unlicensed',
     extras_require={
