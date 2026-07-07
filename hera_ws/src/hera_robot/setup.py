@@ -21,6 +21,7 @@ setup(
         'console_scripts': [
             'transcribe_service = hera_robot.transcribeService:main',
             'transcribe_client = hera_robot.transcribeClient:main',
+            'transcribe_service_model_small = hera_robot.transcribeServiceModelSmall:main',
         ],
     },
 )
