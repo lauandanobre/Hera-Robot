@@ -1,4 +1,6 @@
-# um service de transcrição de fala para texto usando o modelo Vosk (offline)
+# esse é um nó de service ROS2 que utiliza o modelo grande do vosk para transcrever fala em português para texto
+# nesse codigo foi melhorado em relação ao modelo pequeno o buffer de leitura do mic para 8192
+# e recriado o recognizer a cada chamada para não correr o risco de acumular muito lixo de memória do modelo grandde
 
 import rclpy
 from rclpy.node import Node
@@ -6,90 +8,89 @@ from std_srvs.srv import Trigger
 import os
 import json
 import pyaudio
+import time 
+import sys 
 from vosk import Model, KaldiRecognizer
+from ament_index_python.packages import get_package_share_directory
 
 class TranscreverService(Node):
     def __init__(self):
-        super().__init__("transcrever_service") # nome do nó 
+        super().__init__("transcrever_service") 
         
-        # Caminho do modelo Vosk - usar caminho absoluto
-        model_path = "/home/robofei/LN/Ros2/lau_ws/src/hera_robot/model/vosk-model-small-pt-0.3"
+        package_share = get_package_share_directory('hera_robot') # Pacote
+        # caminho absoluto por enquanto....
+        model_path = "/home/robofei/LN/Ros2/lau_ws/src/hera_robot/model/vosk-model-pt-fb-v0.1.1-20220516_2113"
         
         if not os.path.exists(model_path):
             self.get_logger().error(f"Modelo Vosk não encontrado em: {model_path}")
             raise RuntimeError(f"Modelo Vosk não encontrado em: {model_path}")
         
+        self.get_logger().info("Carregando o modelo grande do Vosk... Por favor, tenha paciência...")
         self.model = Model(model_path)
-        self.recognizer = KaldiRecognizer(self.model, 16000)
         
-        # Configurar áudio
         self.p = pyaudio.PyAudio()
         
-        # service tipo trigger, nome: transcrever_fala, callback
+        # criando um service do tipo trigger
         self.srv = self.create_service(Trigger, 'transcrever_fala', self.transcrever_callback)
-        
-        self.get_logger().info("Serviço de transcrição com Vosk iniciado. Aguardando alguém falar algo...")
+        self.get_logger().info("Serviço de transcrição pronto e pronto para chamadas.")
 
     def transcrever_callback(self, request, response):
         stream = None
         try:
             self.get_logger().info("Ouvindo para o serviço...")
             
-            # Abrir stream de áudio
-            '''stream = self.p.open(
-                format=pyaudio.paInt16,
-                channels=1,
-                rate=16000,
-                input=True,
-                frames_per_buffer=4096
-            )
-            '''
-                        # Abrir stream de áudio apontando direto para o hardware analógico da Intel
+            recognizer = KaldiRecognizer(self.model, 16000)
+            
             stream = self.p.open(
                 format=pyaudio.paInt16,
                 channels=1,
                 rate=16000,
                 input=True,
-                input_device_index=11,
-                frames_per_buffer=4096
+                frames_per_buffer=8192
             )
 
             stream.start_stream()
-            texto_final = ""
+            text_transcribe = ""
             
-            while True:
-                data = stream.read(4096, exception_on_overflow=False)
+            init_time = time.time()
+            timeout = 15
+            
+            while rclpy.ok():
+                if (time.time() - init_time) > timeout:
+                    self.get_logger().warn("Ninguém falou nada dentro do tempo limite.")
+                    break
+
+                # Leitura do buffer aumentado
+                data = stream.read(8192, exception_on_overflow=False)
                 
-                if self.recognizer.AcceptWaveform(data):
-                    result = json.loads(self.recognizer.Result())
-                    # CORREÇÃO: Pegar o campo 'text' que traz a frase inteira processada
+                if recognizer.AcceptWaveform(data):
+                    result = json.loads(recognizer.Result())
                     if 'text' in result and result['text'].strip():
-                        texto_final = result['text']
-                        break # Encerra o loop assim que detectar o fim de uma frase estruturada
+                        text_transcribe = result['text']
+                        break 
                 else:
-                    partial = json.loads(self.recognizer.PartialResult())
+                    partial = json.loads(recognizer.PartialResult())
                     if 'partial' in partial and partial['partial']:
                         self.get_logger().debug(f"Parcial: {partial['partial']}")
+                        init_time = time.time()
             
-            # Garante o fechamento seguro do hardware de áudio
+            # para o audio
             stream.stop_stream()
             stream.close()
             stream = None
             
-            # Fazer reconhecimento final dos dados restantes no buffer do Vosk
-            final_result = json.loads(self.recognizer.FinalResult())
+            # uma forma de processar o buffer mais pesado do modelo
+            final_result = json.loads(recognizer.FinalResult())
             if 'text' in final_result and final_result['text'].strip():
-                # Se já pegamos texto no loop, junta. Se não, assume o final.
-                if texto_final:
-                    texto_final = f"{texto_final} {final_result['text']}".strip()
+                if text_transcribe:
+                    text_transcribe = f"{text_transcribe} {final_result['text']}".strip()
                 else:
-                    texto_final = final_result['text']
+                    text_transcribe = final_result['text']
             
-            # Tratamento da resposta para o ROS 2
-            if texto_final:
+            if text_transcribe:
                 response.success = True
-                response.message = texto_final
-                self.get_logger().info(f"Transcrição enviada: {texto_final}")
+                response.message = text_transcribe
+                self.get_logger().info(f"Transcrição enviada: {text_transcribe}")
             else:
                 response.success = False
                 response.message = "Não consegui reconhecer nada"
@@ -97,23 +98,22 @@ class TranscreverService(Node):
                 
         except Exception as e:
             response.success = False
-            response.message = f"Erro: {str(e)}"
+            response.message = f"Erro no processamento: {str(e)}"
             self.get_logger().error(response.message)
             
-            # Limpeza emergencial do microfone se houver crash
             if stream is not None:
                 try:
                     stream.stop_stream()
                     stream.close()
                 except Exception:
                     pass
-            
-            # Reiniciar o recognizer em caso de erro catastrófico
-            self.recognizer = KaldiRecognizer(self.model, 16000)
         
         return response
 
 def main(args=None):
+    if args is None:
+        args = sys.argv
+        
     rclpy.init(args=args)
     node = TranscreverService()
     try:
@@ -121,7 +121,9 @@ def main(args=None):
     except KeyboardInterrupt:
         pass
     finally:
-        rclpy.shutdown()
+        if rclpy.ok():
+            node.destroy_node()
+            rclpy.shutdown()
 
 if __name__ == '__main__':
     main()

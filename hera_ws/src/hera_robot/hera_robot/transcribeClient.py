@@ -20,6 +20,7 @@ class TranscreverClient(Node):
 
         if future.result() is not None:
             response = future.result()
+            # print(response)
             self.get_logger().info(f'Resposta recebida: success={response.success}, message="{response.message}"')
         else:
             self.get_logger().error('Falha ao chamar o serviço de transcrição.')
