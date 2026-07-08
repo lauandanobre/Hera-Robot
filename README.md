@@ -10,7 +10,7 @@ Os códigos-fonte dos pacotes ROS2 estão localizados no diretório `src/`.
 * **Nó de exemplo:** `src/my_robot_controller/my_robot_controller/my_first_node.py`
 
 
-# 2. Instruções
+## 2. Instruções
 
 Os códigos-fonte dos pacotes ROS2 estão localizados no diretório `src/`.
 
