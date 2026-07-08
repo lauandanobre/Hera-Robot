@@ -2,7 +2,7 @@
 
 Esse é um repositório que contém os pacotes de código para robôs que utilizam o ecossistema ROS2 (Robot Operating System 2). Os algoritmos criados foram projetados para utilização na robô Hera.
 
-## Estrutura do Projeto
+## 1. Estrutura do Projeto
 
 O workspace de desenvolvimento principal está localizado no diretório `hera_ws`.
 
@@ -10,7 +10,7 @@ Os códigos-fonte dos pacotes ROS2 estão localizados no diretório `src/`.
 * **Nó de exemplo:** `src/my_robot_controller/my_robot_controller/my_first_node.py`
 
 
-# Instruções
+# 2. Instruções
 
 Os códigos-fonte dos pacotes ROS2 estão localizados no diretório `src/`.
 
@@ -18,7 +18,7 @@ Já o Nó de exemplo está em: `src/my_robot_controller/my_robot_controller/my_f
 
 > Observação: este fluxo foi pensado para Ubuntu 24.04 com ROS 2 Humble instalado. Ele não foi validado para outros sistemas operacionais ou distribuições.
 
-## Forma tradicional de rodar
+## 2.1 Forma tradicional de rodar:
 
 Entre no workspace:
 ```bash
@@ -41,7 +41,7 @@ Rode o projeto de exemplo:
 ros2 run my_robot_controller my_first_node
 ```
 
-## Para rodar rapidamente
+## 2.2 Uma outra forma de rodar rapidamente:
 
 Na raiz do repositório, execute:
 
@@ -50,7 +50,7 @@ chmod +x run_hera.sh
 ./run_hera.sh
 ```
 
-Esse script faz automaticamente:
+### Esse script faz automaticamente:
 
 - carrega o ambiente do ROS 2 com `source /opt/ros/humble/setup.bash`
 - compila o workspace com `colcon build --symlink-install`
