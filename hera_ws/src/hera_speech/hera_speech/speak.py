@@ -4,17 +4,17 @@ from std_srvs.srv import Trigger
 
 class TranscreverClient(Node):
     def __init__(self):
-        super().__init__('transcrever_client')
-        self.client = self.create_client(Trigger, 'transcrever_fala')
+        super().__init__('speak')
+        self.client = self.create_client(Trigger, 'hear')
         self.get_logger().info('Inicializando cliente de transcrição...')
 
-        if not self.client.wait_for_service(timeout_sec=5.0):
-            self.get_logger().error('Serviço /transcrever_fala não disponível.')
-            raise RuntimeError('Serviço de transcrição não encontrado')
+        if not self.client.wait_for_service(timeout_sec=5.0): # espera até 5 segundos para se conectar com o service
+            self.get_logger().error('O serviço "hear" parece não estar disponível. Certifique-se de que o nó do servidor está rodando.')
+            raise RuntimeError('Serviço "hear" não encontrado')
 
     def call_transcribe(self):
         request = Trigger.Request()
-        self.get_logger().info('Solicitando transcrição para o service...')
+        self.get_logger().info('Solicitando transcrição para o client speak...')
         future = self.client.call_async(request)
         rclpy.spin_until_future_complete(self, future)
 
