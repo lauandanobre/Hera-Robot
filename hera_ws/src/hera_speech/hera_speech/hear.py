@@ -21,7 +21,7 @@ class TranscreverService(Node):
         
         # Escolha "cuda" se tiver GPU Nvidia ou "cpu" para rodar no processador.
         # float16 é ideal para GPU. Para CPU use "int8".
-        self.model = WhisperModel(model_path, device="cpu", compute_type="float16")
+        self.model = WhisperModel(model_path, device="cpu") # compute_type="float16"
         
         self.p = pyaudio.PyAudio()
         
