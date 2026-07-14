@@ -35,6 +35,10 @@ elif [ "$#" -eq 1 ]; then
       PACKAGE="hera_robot"
       NODE="transcribe_service"
       ;;
+    hera_speech)
+      PACKAGE="hera_speech"
+      NODE="speech_node"
+      ;;
     *)
       PACKAGE="my_robot_controller"
       NODE="$1"
