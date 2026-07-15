@@ -1,7 +1,3 @@
-# esse é um nó de service ROS2 que utiliza o modelo grande do vosk para transcrever fala em português para texto
-# nesse codigo foi melhorado em relação ao modelo pequeno o buffer de leitura do mic para 8192
-# e recriado o recognizer a cada chamada para não correr o risco de acumular muito lixo de memória do modelo grandde
-
 import rclpy
 from rclpy.node import Node
 from std_srvs.srv import Trigger
@@ -17,22 +13,33 @@ class TranscreverService(Node):
     def __init__(self):
         super().__init__("transcrever_service") 
         
-        package_share = get_package_share_directory('hera_robot') # Pacote
-        # caminho absoluto por enquanto....
-        model_path = "/home/robofei/LN/Ros2/lau_ws/src/hera_robot/model/vosk-model-pt-fb-v0.1.1-20220516_2113"
+        # 1. Declaração do parâmetro para escolher entre CPU e CUDA (Padrão: False/CPU)
+        self.declare_parameter('use_cuda', False)
+        use_cuda = self.get_parameter('use_cuda').get_parameter_value().bool_value
+        
+        # 2. Resolução do caminho relativo baseado no share directory do pacote ROS2
+        package_share = get_package_share_directory('hera_robot')
+        # Aponta para: share/hera_robot/model/vosk-model-pt-fb-v0.1.1-20220516_2113
+        model_path = os.path.join(package_share, "model", "vosk-model-pt-fb-v0.1.1-20220516_2113")
         
         if not os.path.exists(model_path):
             self.get_logger().error(f"Modelo Vosk não encontrado em: {model_path}")
             raise RuntimeError(f"Modelo Vosk não encontrado em: {model_path}")
         
-        self.get_logger().info("Carregando o modelo grande do Vosk... Por favor, tenha paciência...")
-        self.model = Model(model_path)
+        self.get_logger().info(f"Carregando o modelo grande do Vosk (CUDA={use_cuda})... Por favor, tenha paciência...")
+        
+        # 3. Inicialização do modelo aplicando a flag de hardware se CUDA for True
+        if use_cuda:
+            # Configura o Vosk/Kaldi para usar o dispositivo GPU 0
+            self.model = Model(model_path, "cuda:0")
+        else:
+            self.model = Model(model_path)
         
         self.p = pyaudio.PyAudio()
         
-        # criando um service do tipo trigger
+        # Criando um service do tipo trigger
         self.srv = self.create_service(Trigger, 'transcrever_fala', self.transcrever_callback)
-        self.get_logger().info("Serviço de transcrição pronto e pronto para chamadas.")
+        self.get_logger().info("Serviço de transcrição pronto e aguardando chamadas.")
 
     def transcrever_callback(self, request, response):
         stream = None
@@ -74,12 +81,12 @@ class TranscreverService(Node):
                         self.get_logger().debug(f"Parcial: {partial['partial']}")
                         init_time = time.time()
             
-            # para o audio
+            # Para o audio
             stream.stop_stream()
             stream.close()
             stream = None
             
-            # uma forma de processar o buffer mais pesado do modelo
+            # Uma forma de processar o buffer mais pesado do modelo
             final_result = json.loads(recognizer.FinalResult())
             if 'text' in final_result and final_result['text'].strip():
                 if text_transcribe:
