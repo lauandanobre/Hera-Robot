@@ -28,7 +28,7 @@ Ative o ambiente Ros2:
 ```bash
 source /opt/ros/humble/setup.bash
 ```
-Compile:
+Compile o projeto:
 ```bash
 colcon build
 ```
@@ -46,11 +46,11 @@ ros2 run my_robot_controller my_first_node
 Na raiz do repositório, execute:
 
 ```bash
-chmod +x run_hera.sh
-./run_hera.sh
+chmod +x build.sh
+./build.sh
 ```
 
-### Esse script faz automaticamente:
+### Esse script automaticamente:
 
 - carrega o ambiente do ROS 2 com `source /opt/ros/humble/setup.bash`
 - compila o workspace com `colcon build --symlink-install`
@@ -60,8 +60,8 @@ chmod +x run_hera.sh
 Você também pode passar o pacote e o nó desejados:
 
 ```bash
-./run_hera.sh my_publisher
-./run_hera.sh my_robot_controller my_first_node
-./run_hera.sh hera_robot transcribe_service
-./run_hera.sh hera_robot transcribe_client
+./build.sh my_publisher
+./build.sh my_robot_controller my_first_node
+./build.sh hera_robot transcribe_service
+./build.sh hera_robot transcribe_client
 ```
