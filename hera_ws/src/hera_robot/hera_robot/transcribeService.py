@@ -20,7 +20,8 @@ class TranscreverService(Node):
         # 2. Resolução do caminho relativo baseado no share directory do pacote ROS2
         package_share = get_package_share_directory('hera_robot')
         # Aponta para: share/hera_robot/model/vosk-model-pt-fb-v0.1.1-20220516_2113
-        model_path = os.path.join(package_share, "model", "vosk-model-pt-fb-v0.1.1-20220516_2113")
+        #model_path = os.path.join(package_share, "model", "vosk-model-pt-fb-v0.1.1-20220516_2113")
+        model_path = "/home/robofei/LN/Hera-Robot/hera_ws/src/hera_robot/model/vosk-model-pt-fb-v0.1.1-20220516_2113"
         
         if not os.path.exists(model_path):
             self.get_logger().error(f"Modelo Vosk não encontrado em: {model_path}")
