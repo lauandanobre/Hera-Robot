@@ -64,4 +64,6 @@ Você também pode passar o pacote e o nó desejados:
 ./build.sh my_robot_controller my_first_node
 ./build.sh hera_robot transcribe_service
 ./build.sh hera_robot transcribe_client
+./build.sh hera_speech hear
+./build.sh hera_speech speak
 ```
