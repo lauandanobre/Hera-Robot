@@ -9,7 +9,7 @@ import numpy as np
 from faster_whisper import WhisperModel
 from ament_index_python.packages import get_package_share_directory
 
-LANG = "pt"
+LANG = "en"
 
 class TranscreverService(Node):
     def __init__(self):
@@ -57,8 +57,7 @@ class TranscreverService(Node):
                 current_time = time.time()
                 
                 if (current_time - init_time) > timeout:  # tempo limite para esperar algúem falar
-                    speech_detected = False
-                    self.get_logger().warn("Ninguém falou nada dentro do tempo limite.")
+                    #self.get_logger().warn("Ninguém falou nada dentro do tempo limite.")
                     break
                 
                 data = stream.read(8192, exception_on_overflow=False)# Leitura do buffer do microfone
