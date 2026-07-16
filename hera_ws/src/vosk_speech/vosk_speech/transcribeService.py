@@ -17,13 +17,17 @@ class TranscreverService(Node):
         self.declare_parameter('use_cuda', False)
         use_cuda = self.get_parameter('use_cuda').get_parameter_value().bool_value
         
-        package_share = get_package_share_directory('hera_robot')
-        # Aponta para: share/hera_robot/model/vosk-model-pt-fb-v0.1.1-20220516_2113
-        model_path = os.path.join(package_share, "model", "vosk-model-pt-fb-v0.1.1-20220516_2113")
-        
+        package_share = get_package_share_directory('vosk_speech')
+
+        # caminho absoluto por qnquanto
+        model_path = "/home/robofei/LN/Hera-Robot/hera_ws/src/vosk_speech/model/vosk-model-pt-fb-v0.1.1-20220516_2113"
+
+
+        print(f"[VOSK INFO] Carregando modelo do share do pacote: {model_path}")
+
         if not os.path.exists(model_path):
-            self.get_logger().error(f"Modelo Vosk não encontrado em: {model_path}")
-            raise RuntimeError(f"Modelo Vosk não encontrado em: {model_path}")
+            raise FileNotFoundError(f"Modelo nao encontrado no share do ROS 2. Verifique o seu setup.py: {model_path}")
+
         
         self.get_logger().info(f"Carregando o modelo grande do Vosk (CUDA={use_cuda})... Por favor, tenha paciência...")
         
