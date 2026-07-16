@@ -3,6 +3,7 @@ from rclpy.node import Node
 from std_srvs.srv import Trigger
 
 class TranscreverClient(Node):
+    
     def __init__(self):
         super().__init__('speak')
         self.client = self.create_client(Trigger, 'hear')
@@ -32,7 +33,7 @@ def main(args=None):
 
     try:
         node = TranscreverClient()
-        node.get_logger().info('Cliente em loop. Pressione Ctrl+C para sair.')
+        node.get_logger().info('Olá! O Cliente está em loop. Pressione Ctrl+C se quiser sair.')
         while rclpy.ok():
             node.call_transcribe()
     except KeyboardInterrupt:

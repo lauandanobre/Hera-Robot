@@ -5,7 +5,7 @@
   <version>0.1.0</version>
   <description>Esse é um repositório de estudos do ROS2 Humble</description>
   <maintainer email="hello-nobre@outlook.com">lauanda nobre</maintainer>
-  <license>Unlicensed</license>
+  <license>MIT</license>
 
   <depend>rclpy</depend>
   <depend>std_msgs</depend>
