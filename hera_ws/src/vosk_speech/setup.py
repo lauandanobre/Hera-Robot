@@ -23,6 +23,7 @@ setup(
             'transcribe_service = vosk_speech.transcribeService:main',
             'transcribe_client = vosk_speech.transcribeClient:main',
             'transcribe_service_model_small = vosk_speech.transcribeServiceModelSmall:main',
+            'hear = vosk_speech.hear:main', 
         ],
     },
 )
