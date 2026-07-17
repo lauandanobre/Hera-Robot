@@ -1,3 +1,4 @@
+# execute o nó hear com o nó speak
 import rclpy
 from rclpy.node import Node
 from std_srvs.srv import Trigger
@@ -9,7 +10,7 @@ import numpy as np
 from faster_whisper import WhisperModel
 from ament_index_python.packages import get_package_share_directory
 
-LANG = "en"
+LANG = "pt"
 
 class TranscreverService(Node):
     def __init__(self):
@@ -22,7 +23,7 @@ class TranscreverService(Node):
         
         # Escolha "cuda" se tiver GPU Nvidia ou "cpu" para rodar no processador.
         # float16 é ideal para GPU. Para CPU use "int8".
-        self.model = WhisperModel(model_path, device="cpu", compute_type="int8")
+        self.model = WhisperModel(model_path, device="cuda", compute_type="float16")
         
         self.p = pyaudio.PyAudio()
         
@@ -47,7 +48,7 @@ class TranscreverService(Node):
 
             stream.start_stream()
             audio_frames = []
-            noise_background = 500 # nível minimo de ruido de fundo para começar a gravar o aúdio
+            noise_background = 500 # nível minimo de ruido de fundo do ambiente para começar a gravar o aúdio
             init_time = time.time()
             timeout = 15
             silence_threshold = 2.0 # Tempo sem áudio significativo para encerrar a gravação
@@ -115,6 +116,12 @@ class TranscreverService(Node):
                     pass
         
         return response
+    
+    def destroy_node(self):
+        self.get_logger().info("Fechando recursos de hardware...")
+        if hasattr(self, 'p'):
+            self.p.terminate()
+        super().destroy_node()
 
 def main(args=None):
     if args is None:
