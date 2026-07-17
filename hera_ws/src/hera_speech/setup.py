@@ -22,6 +22,8 @@ setup(
         'console_scripts': [
             'hear = hera_speech.hear:main',
             'speak = hera_speech.speak:main',
+            'hear_node = hera_speech.hear_node:main',
+            'speak_node = hera_speech.speak_node:main',
         ],
     },
 )
