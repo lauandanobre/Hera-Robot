@@ -16,7 +16,7 @@ Os códigos-fonte dos pacotes ROS2 estão localizados no diretório `src/`.
 
 Já o Nó de exemplo está em: `src/my_robot_controller/my_robot_controller/my_first_node.py`.
 
-> Observação: este fluxo foi pensado para Ubuntu 24.04 com ROS 2 Humble instalado. Ele não foi validado para outros sistemas operacionais ou distribuições.
+> Observação: este fluxo foi pensado para Ubuntu 22.04 com ROS 2 Humble instalado. Ele não foi validado para outros sistemas operacionais ou distribuições.
 
 ## 2.1 Forma tradicional de rodar:
 
