@@ -1,0 +1,31 @@
+# Parâmetros do nó hear_v2. Para testar sem editar este arquivo:
+#   ros2 run hera_speech hear_v2 --ros-args -p model_size:=small -p language:=en
+hear_node:
+  ros__parameters:
+    # --- modelo ---
+    model_size: medium          # tiny | base | small | medium | large-v3-turbo | pasta local
+    device: auto                # auto | cuda | cpu   (auto cai para CPU se não houver GPU)
+    compute_type: auto          # auto = int8_float16 na GPU; ou float16 | int8 ...
+    language: pt                # pt | en | auto | "pt,en" (escolhe só entre as listadas)
+    beam_size: 2
+    vad_filter: true            # VAD Silero do faster-whisper
+    initial_prompt: ""          # ex.: "Comandos da Hera: avançar, parar, esquerda, direita."
+    local_files_only: false     # true = nunca tenta baixar (use no robô/competição offline)
+    model_dir: ""               # pasta de cache dos modelos (vazio = padrão)
+    text_mode: raw              # raw | lower | match (minúsculas, sem acento e pontuação)
+    # --- microfone / gravação ---
+    input_device_index: -1      # -1 = padrão do sistema (veja: hera_cli devices)
+    max_wait_speech_s: 8.0      # quanto esperar alguém começar a falar
+    max_record_s: 20.0
+    silence_end_s: 1.0          # silêncio que encerra a fala
+    min_rms: 200.0              # piso do limiar de voz (suba se o ambiente for barulhento)
+    vad_mode: energy            # energy | webrtc (precisa de: pip install webrtcvad)
+    # --- bipe ---
+    beep: true
+    beep_freq: 700
+    beep_duration_ms: 300
+    local_beep: true            # toca localmente se o serviço 'beep' não existir
+    # --- interface ROS ---
+    service_name: hear
+    service_type: auto          # auto | hera (hera_msgs/Hear) | trigger (std_srvs/Trigger)
+    topic: transcription

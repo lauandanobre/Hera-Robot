@@ -1,0 +1,6 @@
+# Dependências Python do hear_v2 (instale no mesmo ambiente do ROS 2)
+faster-whisper>=1.1.0     # >=1.1.0 para suportar large-v3-turbo
+numpy
+pyaudio                   # antes: sudo apt install portaudio19-dev
+# opcionais
+# webrtcvad               # vad_mode: webrtc (melhor em ruído de fala/TV)
