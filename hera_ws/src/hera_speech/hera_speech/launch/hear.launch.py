@@ -6,11 +6,11 @@ from launch_ros.actions import Node
 
 
 def generate_launch_description():
-    config = os.path.join(get_package_share_directory('hera_speech'), 'config', 'hear_v2.yaml')
+    config = os.path.join(get_package_share_directory('hera_speech'), 'config', 'hear.yaml')
     return LaunchDescription([
         Node(
             package='hera_speech',
-            executable='hear_v2',
+            executable='hear',
             name='hear_node',
             output='screen',
             parameters=[config],

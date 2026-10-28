@@ -28,11 +28,11 @@ setup(
             # versões antigas (continuam funcionando)
             'hear = hera_speech.hear:main',
             'speak = hera_speech.speak:main',
-            'hear_node = hera_speech.hear_node:main',
-            'speak_node = hera_speech.speak_node:main',
+            # 'hear_node = hera_speech.hear_node:main',
+            # 'speak_node = hera_speech.speak_node:main',
             
             # versão nova
-            'hear_v2 = hera_speech.hear_v2:main',
+            # 'hear_v2 = hera_speech.hear_v2:main',
             'hera_cli = hera_speech.cli:main',
             'hera_bench = hera_speech.bench:main',
         ],

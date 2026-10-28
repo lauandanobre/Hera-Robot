@@ -1,5 +1,5 @@
-# Parâmetros do nó hear_v2. Para testar sem editar este arquivo:
-#   ros2 run hera_speech hear_v2 --ros-args -p model_size:=small -p language:=en
+# Parâmetros do nó hear. Para testar sem editar este arquivo:
+#   ros2 run hera_speech hear --ros-args -p model_size:=small -p language:=en
 hear_node:
   ros__parameters:
     # --- modelo ---

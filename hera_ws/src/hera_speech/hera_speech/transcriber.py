@@ -2,11 +2,11 @@
 Transcrição com faster-whisper, sem ROS.
 
 O que este módulo faz por você:
-  * escolhe GPU/CPU e o tipo de cálculo sozinho (cuda int8_float16 -> float16
-    -> int8 -> cpu int8), então o nó não quebra em máquina sem GPU ou sem VRAM;
-  * aceita idioma fixo ('pt'), automático ('auto') ou uma lista ('pt,en');
-  * filtra alucinações típicas do Whisper em silêncio/ruído;
-  * devolve tempo gasto e RTF para você medir a performance.
+utiliza a GPU ou CPU e o tipo de cálculo sozinho (cuda int8_float16 -> float16 
+-> int8 -> cpu int8), caso coloque auto o nó não quebra em máquina sem GPU ou sem VRAM;
+aceita idioma fixo ('pt'), automático ('auto') ou uma lista ('pt,en');
+filtra alucinações típicas do Whisper em silêncio/ruído;
+devolve tempo gasto e RTF para você medir a performance.
 """
 
 import gc
@@ -222,3 +222,70 @@ class Transcriber:
             seconds=time.perf_counter() - t0,
             dropped=dropped,
         )
+
+if __name__ == "__main__":
+    import os
+
+    # 1. Configura um logger simples para ver o que está acontecendo no terminal
+    def simple_log(msg):
+        print(f"[Transcriber] {msg}")
+
+    # 2. Instancia o configurador (pode mudar para 'tiny' se quiser testar rápido)
+    config = TranscriberConfig(
+        model_size='tiny',# Usando tiny para baixar e testar mais rápido
+        device='cpu',# auto, cuda ou cpu
+        language='en',# en, pt...
+        warmup=True    
+    )
+
+    # 3. Inicializa o Transcritor (vai disparar o download e o warmup)
+    print("--- Inicializando o Transcriber ---")
+    transcriber = Transcriber(cfg=config, log=simple_log)
+    print("-----------------------------------\n")
+
+    # --- OPÇÃO A: Teste rápido com 3 segundos de SILÊNCIO absoluto ---
+    print("--- Teste 1: Enviando 3 segundos de silêncio (deve filtrar alucinações) ---")
+    audio_silencio = np.zeros(SAMPLE_RATE * 3, dtype=np.float32)
+    
+    resultado_silencio = transcriber.transcribe(audio_silencio)
+    print(f"Texto transcrito: '{resultado_silencio.text}'")
+    print(f"Idioma detectado: {resultado_silencio.language} ({resultado_silencio.language_prob:.2f})")
+    print(f"Tempo de processamento: {resultado_silencio.seconds:.2f}s | RTF: {resultado_silencio.rtf:.4f}")
+    print(f"Segmentos descartados pelo filtro: {resultado_silencio.dropped}")
+    print("-----------------------------------------------------------------------\n")
+
+    # --- OPÇÃO B: Teste com um arquivo .wav real (Opcional) ---
+    # Substitua pelo caminho de um arquivo real se quiser testar a voz
+    caminho_audio_real = "seu_audio.wav" 
+
+    if os.path.exists(caminho_audio_real):
+        print(f"--- Teste 2: Transcrevendo arquivo real: {caminho_audio_real} ---")
+        try:
+            import soundfile as sf
+            
+            # Carrega o áudio usando a biblioteca soundfile
+            data, samplerate = sf.read(caminho_audio_real)
+            
+            # Garante que o áudio seja convertido para Mono se for Estéreo
+            if len(data.shape) > 1:
+                data = np.mean(data, axis=1)
+                
+            # Verifica se o sample rate está correto
+            if samplerate != SAMPLE_RATE:
+                print(f"Aviso: O áudio está em {samplerate}Hz, mas o Whisper espera {SAMPLE_RATE}Hz.")
+            
+            # Converte explicitamente para float32
+            audio_real = data.astype(np.float32)
+            
+            # Executa a transcrição do áudio real
+            resultado_real = transcriber.transcribe(audio_real)
+            print(f"Texto final: \"{resultado_real.text}\"")
+            print(f"Tempo de processamento: {resultado_real.seconds:.2f}s | RTF: {resultado_real.rtf:.4f}")
+            
+        except ImportError:
+            print("Para testar arquivos .wav reais, instale a biblioteca: pip install soundfile")
+        except Exception as e:
+            print(f"Erro ao ler o arquivo de áudio: {e}")
+        print("-----------------------------------------------------------------------")
+    else:
+        print(f"Dica: Se quiser testar voz real, coloque um arquivo em '{os.path.abspath(caminho_audio_real)}'")
